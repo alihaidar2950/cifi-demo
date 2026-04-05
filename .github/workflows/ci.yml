@@ -28,6 +28,6 @@ jobs:
 
       - name: Analyze failure with CIFI
         if: failure()
-        uses: alihaidar2950/cifi@v1
+        uses: alihaidar2950/cifi@9d67de02410e589d69ad3481d369cb1b15a7095d
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

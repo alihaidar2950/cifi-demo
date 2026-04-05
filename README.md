@@ -37,3 +37,4 @@ def test_add_integers():
     github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 # trigger fresh run
+# trigger after repo made public

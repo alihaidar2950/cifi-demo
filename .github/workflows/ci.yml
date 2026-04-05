@@ -26,7 +26,7 @@ jobs:
       - name: Run tests
         id: run-tests
         run: |
-          pytest tests/ -v 2>&1 | tee /tmp/test-output.log
+          pytest tests/ -v 2>&1 | tee $GITHUB_WORKSPACE/cifi-test.log
           exit ${PIPESTATUS[0]}
 
       - name: Analyze failure with CIFI
@@ -34,4 +34,4 @@ jobs:
         uses: alihaidar2950/cifi@9d67de02410e589d69ad3481d369cb1b15a7095d
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          log-file: /tmp/test-output.log
+          log-file: cifi-test.log

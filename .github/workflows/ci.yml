@@ -31,8 +31,32 @@ jobs:
           exit ${PIPESTATUS[0]}
 
       - name: Analyze failure with CIFI
+        id: cifi-analysis
         if: failure()
         uses: alihaidar2950/cifi@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           log-file: cifi-test.log
+
+      - name: Show CIFI analysis outputs
+        if: failure() && steps.cifi-analysis.outcome == 'success'
+        run: |
+          echo "=== CIFI Analysis Results ==="
+          echo "Failure type : ${{ steps.cifi-analysis.outputs.failure-type }}"
+          echo "Confidence   : ${{ steps.cifi-analysis.outputs.confidence }}"
+          echo "Root cause   : ${{ steps.cifi-analysis.outputs.root-cause }}"
+
+      - name: Verify CIFI comment posted
+        if: failure() && github.event_name == 'pull_request' && steps.cifi-analysis.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR=${{ github.event.pull_request.number }}
+          echo "Verifying CIFI comment on PR #$PR..."
+          FOUND=$(gh api "repos/${{ github.repository }}/issues/$PR/comments" \
+            --jq '[.[] | select(.body | contains("<!-- cifi-analysis -->"))] | length')
+          if [ "$FOUND" -eq 0 ]; then
+            echo "❌ CIFI comment not posted on PR #$PR"
+            exit 1
+          fi
+          echo "✅ CIFI comment verified (found $FOUND comment)"
